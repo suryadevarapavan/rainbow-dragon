@@ -28,7 +28,7 @@ def save(link,path):
        file.write(response.content) 
 
 #for http request 
-response = intial.request('GET',ip)
+response = r.request('GET',ip)
 
 #for finding specific links
 response=r.get(ip)
