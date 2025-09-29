@@ -22,6 +22,7 @@ path=str(input("ENTER PATH:"))
 
 #this function saved gifs
 def save(link,path):
+os.makedirs(path, exist_ok=True)
     response = r.get(link)
     t=os.path.basename(urlparse(link).path)
     with open(f'{path}/{t}','wb') as file:
