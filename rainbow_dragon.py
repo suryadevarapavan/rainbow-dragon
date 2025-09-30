@@ -50,6 +50,10 @@ try:
                 flink = urljoin(ip, link)
                 links.append(flink)
 
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(save, link, path) for link in links]
+            for future in as_completed(futures):
+                pass
 
         # for finding specific links
         base = response.text
