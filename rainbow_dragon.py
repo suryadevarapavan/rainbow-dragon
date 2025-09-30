@@ -1,8 +1,8 @@
-
 from urllib.parse import urlparse, urljoin
 import requests as r
 import os
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 print(r"""
              __.-/|
@@ -35,19 +35,27 @@ def save(link, path):
         for i in response.iter_content(1024):
             file.write(i)
 
-# for http request 
-response = r.get(ip)
-
-# for finding specific links
+# for http session
 try:
-    base = response.text
-    soup = BeautifulSoup(base, 'html.parser')
-    for tag in soup.find_all(['img', 'a', 'source']):
-        link = tag.get('src') or tag.get('href')
-        if link and tp in link.lower():  # filter by file type
-            flink = urljoin(ip, link)  # make absolute URL
-            save(flink, path)
-            print(f"Downloaded: {flink}")
+    with r.Session() as session:
+        session.headers.update({'User-Agent': 'Morzilla/5.0'})
+        
+        response = session.get(ip)
+        base = response.text
+        soup = BeautifulSoup(base, 'html.parser')
+        links = []
+        for tag in soup.find_all(['img', 'a', 'source']):
+            link = tag.get('src') or tag.get('href')
+            if link and tp in link.lower():
+                flink = urljoin(ip, link)
+                links.append(flink)
+
+
+        # for finding specific links
+        base = response.text
+        soup = BeautifulSoup(base, 'html.parser')
+        save(flink, path)
+        print(f"Downloaded: {flink}")
 
 except r.exceptions.HTTPError as eh:
     print(f"Error:{eh}")
@@ -57,3 +65,4 @@ except r.exceptions.Timeout as et:
     print(f"Error:{et}")
 except r.exceptions.RequestException as ee:
     print(f"Error:{ee}")
+
